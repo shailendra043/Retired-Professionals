@@ -18,18 +18,14 @@ Flutter marketplace MVP for connecting retired professionals with students and c
 
 ## CI/CD
 
-Two GitHub Actions workflows are configured:
+GitHub Actions workflows configured:
 
 1. **CI** ([.github/workflows/ci.yml](.github/workflows/ci.yml))
-	- Runs on push/PR
-	- Flutter: `pub get`, `analyze`, `test`, `build web`
-	- Admin dashboard: `lint`, `build`
+	- Runs on push/PR.
+	- Flutter Android job: `pub get`, `analyze`, `test`, `build apk --release`.
+	- Flutter iOS job: `pub get`, `build ios --release --no-codesign`.
+	- Uploads artifacts: Android APK and iOS `Runner.app`.
+	- Admin dashboard: `lint`, `build`.
 
-2. **CD (GitHub Pages)** ([.github/workflows/deploy_flutter_web.yml](.github/workflows/deploy_flutter_web.yml))
-	- Deploys Flutter Web on push to `main`
-	- Uses GitHub Pages Actions deployment
-
-## GitHub Pages Setup (one-time)
-
-- In repository settings, go to **Pages**.
-- Set **Source** to **GitHub Actions**.
+2. **Disabled deploy workflow** ([.github/workflows/deploy_flutter_web.yml](.github/workflows/deploy_flutter_web.yml))
+	- GitHub Pages deployment is intentionally disabled.

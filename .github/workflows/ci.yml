@@ -12,8 +12,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  flutter:
-    name: Flutter Analyze, Test, Web & APK Build
+  flutter_android:
+    name: Flutter Analyze, Test & Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -41,15 +41,6 @@ jobs:
       - name: Run tests
         run: flutter test
 
-      - name: Build Flutter Web
-        run: flutter build web --release
-
-      - name: Upload Flutter web artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: flutter-web-build
-          path: build/web
-
       - name: Build Android APK (release)
         run: flutter build apk --release
 
@@ -58,6 +49,32 @@ jobs:
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/*.apk
+
+  flutter_ios:
+    name: Flutter iOS Build (no codesign)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build iOS release (no codesign)
+        run: flutter build ios --release --no-codesign
+
+      - name: Upload iOS app artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-runner-app
+          path: build/ios/iphoneos/Runner.app
 
   admin_dashboard:
     name: Admin Dashboard Lint & Build
