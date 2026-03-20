@@ -1,17 +1,35 @@
-# retired_professionals_app
+# Retired Professionals Platform
 
-A new Flutter project.
+Flutter marketplace MVP for connecting retired professionals with students and companies.
 
-## Getting Started
+## Local Development
 
-This project is a starting point for a Flutter application.
+### Flutter app
+- Install dependencies: `flutter pub get`
+- Run app: `flutter run`
+- Analyze: `flutter analyze`
+- Test: `flutter test`
 
-A few resources to get you started if this is your first Flutter project:
+### Admin dashboard
+- `cd admin_dashboard`
+- Install dependencies: `npm ci`
+- Lint: `npm run lint`
+- Build: `npm run build`
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+## CI/CD
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Two GitHub Actions workflows are configured:
+
+1. **CI** ([.github/workflows/ci.yml](.github/workflows/ci.yml))
+	- Runs on push/PR
+	- Flutter: `pub get`, `analyze`, `test`, `build web`
+	- Admin dashboard: `lint`, `build`
+
+2. **CD (GitHub Pages)** ([.github/workflows/deploy_flutter_web.yml](.github/workflows/deploy_flutter_web.yml))
+	- Deploys Flutter Web on push to `main`
+	- Uses GitHub Pages Actions deployment
+
+## GitHub Pages Setup (one-time)
+
+- In repository settings, go to **Pages**.
+- Set **Source** to **GitHub Actions**.
