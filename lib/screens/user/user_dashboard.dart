@@ -41,18 +41,38 @@ class UserDashboard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Ex-Bank General Manager | 30 Yrs Exp',
+                      'Retired Teacher | 30 Yrs Experience',
                       style: Theme.of(context).textTheme.bodyMedium,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 16),
                     OutlinedButton.icon(
-                      onPressed: () => context.go('/user/setup'),
+                      onPressed: () => context.go('/professional/setup'),
                       icon: const Icon(Icons.edit),
                       label: const Text('Edit Profile'),
                     ),
                   ],
                 ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: _statCard('This Month Sessions', '12', Icons.calendar_month),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _statCard('Estimated Earnings', '₹10,800', Icons.payments),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Card(
+              child: ListTile(
+                leading: const Icon(Icons.verified_user, color: Colors.green),
+                title: const Text('Trust & Verification'),
+                subtitle: const Text('ID Verified • Employment Verified • Onboarding Call Done'),
               ),
             ),
             const SizedBox(height: 32),
@@ -64,16 +84,16 @@ class UserDashboard extends StatelessWidget {
             // Mock Requests
             _buildRequestCard(
               context,
-              clientName: 'StartupX Solutions',
-              projectType: 'Financial Advisory',
-              duration: '2 Hours limit',
+              clientName: 'Parent Group - Bengaluru',
+              projectType: 'Class 10 Physics Mentoring',
+              duration: '1 Hour Session',
               status: 'Pending',
             ),
             _buildRequestCard(
               context,
-              clientName: 'EduTech Academy',
-              projectType: 'Guest Lecture',
-              duration: '1 Hour session',
+              clientName: 'STEM Juniors Academy',
+              projectType: 'Career Guidance Workshop',
+              duration: '2 Hour Session',
               status: 'Confirmed',
             ),
           ],
@@ -111,6 +131,24 @@ class UserDashboard extends StatelessWidget {
             ),
           ),
           backgroundColor: status == 'Pending' ? Colors.orange.shade100 : Colors.green.shade100,
+        ),
+      ),
+    );
+  }
+
+  Widget _statCard(String label, String value, IconData icon) {
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.all(14),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(icon),
+            const SizedBox(height: 8),
+            Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+            const SizedBox(height: 2),
+            Text(label),
+          ],
         ),
       ),
     );

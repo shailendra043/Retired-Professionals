@@ -15,42 +15,51 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _otpController = TextEditingController();
 
   void _sendOtp() {
-    if (_phoneController.text.isNotEmpty) {
+    if (_phoneController.text.trim().isNotEmpty) {
       setState(() {
         _otpSent = true;
       });
     }
   }
 
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _otpController.dispose();
+    super.dispose();
+  }
+
   void _verifyOtp() {
-    // In a real app we'd authenticate. Here we just mock routing based on user type.
-    // Let's show a simple dialog to pick role for testing purposes.
+    if (_otpController.text.trim() != '1234') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Use mock OTP: 1234')),
+      );
+      return;
+    }
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Select Role (Mock)"),
+        title: const Text('Choose Your Role'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
-              title: const Text("Retired Professional"),
+              leading: const Icon(Icons.school),
+              title: const Text('Retired Professional'),
+              subtitle: const Text('Create profile and offer mentoring services'),
               onTap: () {
                 Navigator.pop(context);
-                context.go('/user/dashboard');
+                context.go('/professional/setup');
               },
             ),
             ListTile(
-              title: const Text("Recruitment Client"),
+              leading: const Icon(Icons.business_center),
+              title: const Text('Client (Student / Company)'),
+              subtitle: const Text('Search, compare, and book experts'),
               onTap: () {
                 Navigator.pop(context);
                 context.go('/client/dashboard');
-              },
-            ),
-            ListTile(
-              title: const Text("Admin"),
-              onTap: () {
-                Navigator.pop(context);
-                context.go('/admin/dashboard');
               },
             ),
           ],
@@ -75,13 +84,13 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text(
-                  'Welcome Back!',
+                  'Retired Experience Platform',
                   style: Theme.of(context).textTheme.displayMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Enter your phone number to login or sign up',
+                  'Simple OTP login for age 50-70 professionals and clients',
                   style: Theme.of(context).textTheme.bodyMedium,
                   textAlign: TextAlign.center,
                 ),

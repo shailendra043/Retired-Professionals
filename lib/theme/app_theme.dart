@@ -14,8 +14,8 @@ class AppTheme {
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
         seedColor: primaryColor,
-        background: backgroundColor,
       ),
+      scaffoldBackgroundColor: backgroundColor,
       // Large fonts as requested
       textTheme: GoogleFonts.interTextTheme().copyWith(
         displayLarge: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: textPrimaryColor),
