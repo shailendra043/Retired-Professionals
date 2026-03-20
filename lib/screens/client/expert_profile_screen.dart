@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../data/mock_experts.dart';
+import '../../state/app_state.dart';
 
 class ExpertProfileScreen extends StatelessWidget {
   final String expertId;
@@ -8,7 +8,8 @@ class ExpertProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final match = experts.where((e) => e.id == expertId);
+    final profiles = AppScope.of(context).professionals;
+    final match = profiles.where((e) => e.id == expertId);
     final expert = match.isEmpty ? null : match.first;
     if (expert == null) {
       return Scaffold(
@@ -28,9 +29,9 @@ class ExpertProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(expert.name, style: Theme.of(context).textTheme.titleLarge),
+                  Text(expert.fullName, style: Theme.of(context).textTheme.titleLarge),
                   const SizedBox(height: 6),
-                  Text(expert.title),
+                  Text(expert.designation),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
@@ -38,18 +39,22 @@ class ExpertProfileScreen extends StatelessWidget {
                     children: [
                       Chip(label: Text('${expert.yearsOfExperience} years experience')),
                       Chip(label: Text('₹${expert.hourlyRate}/hour')),
-                      Chip(label: Text(expert.language)),
+                      Chip(label: Text(expert.industry)),
                       Chip(
-                        label: Text(expert.verified ? 'Verified' : 'Verification Pending'),
+                        label: Text(
+                          expert.idVerified && expert.employmentVerified
+                              ? 'Verified'
+                              : 'Verification Pending',
+                        ),
                         avatar: Icon(
-                          expert.verified ? Icons.verified : Icons.info,
+                          expert.idVerified && expert.employmentVerified ? Icons.verified : Icons.info,
                           size: 16,
                         ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
-                  Text(expert.bio),
+                  Text(expert.summary),
                 ],
               ),
             ),
@@ -79,8 +84,8 @@ class ExpertProfileScreen extends StatelessWidget {
           Card(
             child: ListTile(
               leading: const Icon(Icons.star, color: Colors.amber),
-              title: Text('${expert.rating} rating'),
-              subtitle: Text('${expert.sessions} completed sessions'),
+              title: Text('Availability: ${expert.availability}'),
+              subtitle: const Text('Ratings will appear after real bookings.'),
             ),
           ),
           const SizedBox(height: 16),

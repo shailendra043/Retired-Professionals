@@ -21,12 +21,12 @@ class ClientDashboard extends StatelessWidget {
         padding: const EdgeInsets.all(20),
         children: [
           Text(
-            'Find experienced retired educators',
+            'Discover experienced professionals',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 10),
           Text(
-            'Start with one niche (retired teachers) and scale after validation.',
+            'LinkedIn-style discovery for mentoring, consulting and advisory.',
             style: Theme.of(context).textTheme.bodyMedium,
           ),
           const SizedBox(height: 22),
@@ -45,10 +45,10 @@ class ClientDashboard extends StatelessWidget {
                     spacing: 8,
                     runSpacing: 8,
                     children: const [
-                      Chip(label: Text('Education')),
+                      Chip(label: Text('Mentoring')),
                       Chip(label: Text('20+ Years Exp')),
-                      Chip(label: Text('Verified Experts')),
-                      Chip(label: Text('Hindi / English')),
+                      Chip(label: Text('Verified Profiles')),
+                      Chip(label: Text('Consulting')),
                     ],
                   ),
                 ],

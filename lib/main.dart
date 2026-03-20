@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'theme/app_theme.dart';
+import 'state/app_state.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/user/profile_setup_screen.dart';
 import 'screens/user/user_dashboard.dart';
@@ -11,6 +12,8 @@ import 'screens/client/expert_profile_screen.dart';
 void main() {
   runApp(const RetiredProfessionalsApp());
 }
+
+final AppState _appState = AppState();
 
 final GoRouter _router = GoRouter(
   initialLocation: '/login',
@@ -51,11 +54,14 @@ class RetiredProfessionalsApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      title: 'Retired Professionals',
-      theme: AppTheme.lightTheme,
-      routerConfig: _router,
-      debugShowCheckedModeBanner: false,
+    return AppScope(
+      state: _appState,
+      child: MaterialApp.router(
+        title: 'Retired Professionals',
+        theme: AppTheme.lightTheme,
+        routerConfig: _router,
+        debugShowCheckedModeBanner: false,
+      ),
     );
   }
 }

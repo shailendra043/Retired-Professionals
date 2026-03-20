@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../data/mock_experts.dart';
+import '../../state/app_state.dart';
 
 class ExpertSearchScreen extends StatefulWidget {
   const ExpertSearchScreen({super.key});
@@ -16,12 +16,12 @@ class _ExpertSearchScreenState extends State<ExpertSearchScreen> {
   String _language = 'All';
   int _minExperience = 0;
 
-  List<Expert> get _filteredExperts {
-    return experts.where((expert) {
+  List<ProfessionalProfile> _filteredExperts(List<ProfessionalProfile> profiles) {
+    return profiles.where((expert) {
       final rateOk = expert.hourlyRate <= _maxRate;
-      final verifiedOk = !_verifiedOnly || expert.verified;
-      final locationOk = _location == 'All' || expert.location == _location;
-      final languageOk = _language == 'All' || expert.language.contains(_language);
+      final verifiedOk = !_verifiedOnly || (expert.idVerified && expert.employmentVerified);
+      final locationOk = true;
+      final languageOk = true;
       final expOk = expert.yearsOfExperience >= _minExperience;
       return rateOk && verifiedOk && locationOk && languageOk && expOk;
     }).toList();
@@ -29,7 +29,11 @@ class _ExpertSearchScreenState extends State<ExpertSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final locations = ['All', ...{for (final e in experts) e.location}];
+    final appState = AppScope.of(context);
+    final allProfiles = appState.professionals;
+    final visibleProfiles = _filteredExperts(allProfiles);
+
+    final locations = ['All'];
     final languages = ['All', 'English', 'Hindi'];
 
     return Scaffold(
@@ -98,19 +102,27 @@ class _ExpertSearchScreenState extends State<ExpertSearchScreen> {
           ),
           const SizedBox(height: 14),
           Text(
-            '${_filteredExperts.length} experts found',
+            '${visibleProfiles.length} professionals found',
             style: Theme.of(context).textTheme.titleLarge,
           ),
           const SizedBox(height: 8),
-          ..._filteredExperts.map(
+          if (visibleProfiles.isEmpty)
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(16),
+                child: Text('No profiles available yet. Ask a professional to complete onboarding first.'),
+              ),
+            )
+          else
+            ...visibleProfiles.map(
             (expert) => Card(
               child: ListTile(
                 contentPadding: const EdgeInsets.all(14),
-                title: Text(expert.name),
+                title: Text(expert.fullName),
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 6),
                   child: Text(
-                    '${expert.title}\n${expert.yearsOfExperience} yrs • ₹${expert.hourlyRate}/hr • ${expert.location}',
+                    '${expert.designation}\n${expert.yearsOfExperience} yrs • ₹${expert.hourlyRate}/hr',
                   ),
                 ),
                 trailing: const Icon(Icons.arrow_forward_ios, size: 18),

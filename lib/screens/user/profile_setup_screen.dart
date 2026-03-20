@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../state/app_state.dart';
 import '../../widgets/custom_button.dart';
 
 class ProfileSetupScreen extends StatefulWidget {
@@ -20,7 +21,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   String _selectedIndustry = 'Education';
   String _selectedAvailability = '5 hrs/week';
-  String _selectedService = 'Mentoring';
+  final Set<String> _selectedServices = {'Mentoring'};
 
   bool _idVerified = false;
   bool _employmentVerified = false;
@@ -107,21 +108,34 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               const SizedBox(height: 16),
               TextFormField(
                 controller: _designationController,
-                decoration: const InputDecoration(labelText: 'Previous Designation (e.g. AGM, Principal)'),
+                decoration: const InputDecoration(labelText: 'Headline (e.g. Ex Principal | Physics Mentor)'),
                 validator: (value) => value!.isEmpty ? 'Required' : null,
               ),
               const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                initialValue: _selectedService,
-                decoration: const InputDecoration(labelText: 'Primary Service'),
-                items: _services
-                    .map((value) => DropdownMenuItem(value: value, child: Text(value)))
-                    .toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedService = value ?? 'Mentoring';
-                  });
-                },
+              Text(
+                'Services',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              const SizedBox(height: 8),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _services.map((service) {
+                  final selected = _selectedServices.contains(service);
+                  return FilterChip(
+                    selected: selected,
+                    label: Text(service),
+                    onSelected: (value) {
+                      setState(() {
+                        if (value) {
+                          _selectedServices.add(service);
+                        } else {
+                          _selectedServices.remove(service);
+                        }
+                      });
+                    },
+                  );
+                }).toList(),
               ),
               const SizedBox(height: 16),
               DropdownButtonFormField<String>(
@@ -170,8 +184,28 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               CustomButton(
                 text: 'Save & Go to Dashboard',
                 onPressed: () {
-                  if (_formKey.currentState!.validate()) {
+                  if (_formKey.currentState!.validate() && _selectedServices.isNotEmpty) {
+                    final appState = AppScope.of(context);
+                    appState.saveProfessionalProfile(
+                      ProfessionalProfile(
+                        id: DateTime.now().millisecondsSinceEpoch.toString(),
+                        fullName: _nameController.text.trim(),
+                        designation: _designationController.text.trim(),
+                        industry: _selectedIndustry,
+                        yearsOfExperience: int.tryParse(_experienceController.text.trim()) ?? 0,
+                        summary: _summaryController.text.trim(),
+                        availability: _selectedAvailability,
+                        services: _selectedServices.toList(),
+                        hourlyRate: int.tryParse(_rateController.text.trim()) ?? 0,
+                        idVerified: _idVerified,
+                        employmentVerified: _employmentVerified,
+                      ),
+                    );
                     context.go('/professional/dashboard');
+                  } else if (_selectedServices.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Select at least one service.')),
+                    );
                   }
                 },
               ),

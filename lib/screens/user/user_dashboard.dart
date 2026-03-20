@@ -1,14 +1,56 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../state/app_state.dart';
 
-class UserDashboard extends StatelessWidget {
+class UserDashboard extends StatefulWidget {
   const UserDashboard({super.key});
 
   @override
+  State<UserDashboard> createState() => _UserDashboardState();
+}
+
+class _UserDashboardState extends State<UserDashboard> {
+  int _tabIndex = 0;
+  final TextEditingController _postController = TextEditingController();
+
+  @override
+  void dispose() {
+    _postController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final state = AppScope.of(context);
+    final profile = state.currentProfessional;
+
+    if (profile == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Professional Dashboard')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Icon(Icons.person_add_alt_1, size: 56),
+                const SizedBox(height: 12),
+                const Text('Set up your profile to continue.'),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: () => context.go('/professional/setup'),
+                  child: const Text('Complete Profile'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('My Dashboard'),
+        title: const Text('Professional Network'),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -16,123 +58,179 @@ class UserDashboard extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Profile Summary Card
-            Card(
-              elevation: 2,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  children: [
-                    const CircleAvatar(
-                      radius: 50,
-                      backgroundColor: Colors.grey,
-                      child: Icon(Icons.person, size: 50, color: Colors.white),
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Rakesh Sharma',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Retired Teacher | 30 Yrs Experience',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: 16),
-                    OutlinedButton.icon(
-                      onPressed: () => context.go('/professional/setup'),
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Edit Profile'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: _statCard('This Month Sessions', '12', Icons.calendar_month),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: _statCard('Estimated Earnings', '₹10,800', Icons.payments),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Card(
-              child: ListTile(
-                leading: const Icon(Icons.verified_user, color: Colors.green),
-                title: const Text('Trust & Verification'),
-                subtitle: const Text('ID Verified • Employment Verified • Onboarding Call Done'),
-              ),
-            ),
-            const SizedBox(height: 32),
-            Text(
-              'Recent Booking Requests',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            const SizedBox(height: 16),
-            // Mock Requests
-            _buildRequestCard(
-              context,
-              clientName: 'Parent Group - Bengaluru',
-              projectType: 'Class 10 Physics Mentoring',
-              duration: '1 Hour Session',
-              status: 'Pending',
-            ),
-            _buildRequestCard(
-              context,
-              clientName: 'STEM Juniors Academy',
-              projectType: 'Career Guidance Workshop',
-              duration: '2 Hour Session',
-              status: 'Confirmed',
-            ),
-          ],
-        ),
+      body: IndexedStack(
+        index: _tabIndex,
+        children: [
+          _homeTab(context, state, profile),
+          _networkTab(state),
+          _opportunitiesTab(profile),
+          _messagesTab(),
+          _profileTab(context, profile),
+        ],
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _tabIndex,
+        onDestinationSelected: (index) => setState(() => _tabIndex = index),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.home_outlined), label: 'Home'),
+          NavigationDestination(icon: Icon(Icons.people_outline), label: 'My Network'),
+          NavigationDestination(icon: Icon(Icons.work_outline), label: 'Opportunities'),
+          NavigationDestination(icon: Icon(Icons.chat_bubble_outline), label: 'Messages'),
+          NavigationDestination(icon: Icon(Icons.person_outline), label: 'Profile'),
+        ],
       ),
     );
   }
 
-  Widget _buildRequestCard(
-    BuildContext context, {
-    required String clientName,
-    required String projectType,
-    required String duration,
-    required String status,
-  }) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
-        title: Text(clientName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 8),
-            Text('Requirement: $projectType'),
-            Text('Duration: $duration'),
-          ],
-        ),
-        trailing: Chip(
-          label: Text(
-            status,
-            style: TextStyle(
-              color: status == 'Pending' ? Colors.orange.shade900 : Colors.green.shade900,
+  Widget _homeTab(BuildContext context, AppState state, ProfessionalProfile profile) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Share an update', style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 10),
+                TextField(
+                  controller: _postController,
+                  minLines: 2,
+                  maxLines: 4,
+                  decoration: const InputDecoration(
+                    hintText: 'What insight would you like to share today?',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      state.createPost(_postController.text);
+                      _postController.clear();
+                    },
+                    child: const Text('Post'),
+                  ),
+                ),
+              ],
             ),
           ),
-          backgroundColor: status == 'Pending' ? Colors.orange.shade100 : Colors.green.shade100,
         ),
+        const SizedBox(height: 8),
+        if (state.feedPosts.isEmpty)
+          const Card(
+            child: Padding(
+              padding: EdgeInsets.all(18),
+              child: Text('No posts yet. Start your professional feed by sharing your first update.'),
+            ),
+          )
+        else
+          ...state.feedPosts.map(
+            (post) => Card(
+              child: ListTile(
+                title: Text(post.authorName),
+                subtitle: Padding(
+                  padding: const EdgeInsets.only(top: 8),
+                  child: Text(post.content),
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _networkTab(AppState state) {
+    final professionals = state.professionals;
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _statCard('Connections', '${professionals.isEmpty ? 0 : 1}', Icons.people),
+        const SizedBox(height: 10),
+        const Card(
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Text('As more professionals join, this section will show connection requests and recommendations.'),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _opportunitiesTab(ProfessionalProfile profile) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _statCard('Open to work', profile.availability, Icons.work_history),
+        const SizedBox(height: 10),
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Your listed services', style: TextStyle(fontWeight: FontWeight.w700)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: profile.services.map((s) => Chip(label: Text(s))).toList(),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _messagesTab() {
+    return const Center(
+      child: Padding(
+        padding: EdgeInsets.all(24),
+        child: Text('No messages yet.'),
       ),
+    );
+  }
+
+  Widget _profileTab(BuildContext context, ProfessionalProfile profile) {
+    final verification = [
+      if (profile.idVerified) 'ID Verified',
+      if (profile.employmentVerified) 'Employment Verified',
+    ];
+
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(profile.fullName, style: Theme.of(context).textTheme.titleLarge),
+                const SizedBox(height: 4),
+                Text(profile.designation),
+                const SizedBox(height: 8),
+                Text('${profile.industry} • ${profile.yearsOfExperience} years experience'),
+                const SizedBox(height: 8),
+                Text(profile.summary),
+                const SizedBox(height: 10),
+                Text('₹${profile.hourlyRate}/hour'),
+                const SizedBox(height: 10),
+                Text(verification.isEmpty ? 'Verification pending' : verification.join(' • ')),
+                const SizedBox(height: 14),
+                OutlinedButton.icon(
+                  onPressed: () => context.go('/professional/setup'),
+                  icon: const Icon(Icons.edit),
+                  label: const Text('Edit Profile'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

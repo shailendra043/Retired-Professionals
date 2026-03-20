@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _verifyOtp() {
     if (_otpController.text.trim() != '1234') {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Use mock OTP: 1234')),
+        const SnackBar(content: Text('Invalid OTP')),
       );
       return;
     }
@@ -114,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     controller: _otpController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      labelText: 'Enter OTP (Mock: 1234)',
+                      labelText: 'Enter OTP',
                       prefixIcon: Icon(Icons.lock),
                     ),
                   ),
