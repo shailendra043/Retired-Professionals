@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'theme/app_theme.dart';
 import 'state/app_state.dart';
 import 'screens/auth/login_screen.dart';
@@ -9,7 +10,9 @@ import 'screens/client/client_dashboard.dart';
 import 'screens/client/expert_search_screen.dart';
 import 'screens/client/expert_profile_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const RetiredProfessionalsApp());
 }
 

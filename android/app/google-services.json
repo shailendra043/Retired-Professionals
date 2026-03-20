@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1041294505377",
+    "project_id": "rp-data-6668b",
+    "storage_bucket": "rp-data-6668b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1041294505377:android:bf5440db530a05bbb007e0",
+        "android_client_info": {
+          "package_name": "com.example.retired_professionals_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCUNlKXnodDSiR2HdrzYRGyXtbDkcC0oo0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
